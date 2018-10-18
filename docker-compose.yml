@@ -1,0 +1,13 @@
+version: '2'
+services:
+  mongo:
+   image: mongo:latest
+   container_name: mongo
+   ports:
+    - "27017:27017"
+   volumes:
+    - E:\Code\mongodata:/data/db
+
+  thobot:
+    image: thorbot:0.1.0
+    container_name: thorbot
