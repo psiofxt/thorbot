@@ -10,4 +10,4 @@ ADD . /thorbot
 
 RUN pip install -r requirements.txt
 
-CMD ["python", "thorbot.py"]
+CMD ["python", "thorbot/thorbot.py"]
