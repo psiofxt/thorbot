@@ -9,5 +9,5 @@ services:
     - E:\Code\mongodata:/data/db
 
   thorbot:
-    image: thorbot:0.1.0
+    image: thorbot:test
     container_name: thorbot

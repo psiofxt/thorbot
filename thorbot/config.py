@@ -1,3 +1,4 @@
+import pymongo
 from os import environ as env
 from pymongo import MongoClient
 
@@ -13,8 +14,12 @@ class Config():
                 'permitted_ids': [env.get('MASTER_ID')],
                 'blacklist': []
             }
+
+            # Setup DB
             client = MongoClient('mongodb://mongo:27017')
-            db = client.m_db
+            self.db = client.test
+            self.db.users.create_index([('username', pymongo.ASCENDING)],
+                                       unique=True)
 
         except KeyError as e:
             raise Exception(e)
