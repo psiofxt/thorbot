@@ -16,7 +16,7 @@ from config import Config
 from messages import (
     LINK_WARN, PERMITTED, WARN, FINAL_WARNING, WELCOME_MESSAGE, CLEAR_WARN
 )
-from utils import admin_only, exempt_admins
+from utils import admin_only, exempt_admins, config_chat_only
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -37,6 +37,7 @@ class ThorBot():
     def clear_db(self, bot, update):
         self.config.db.users.remove({})
 
+    @config_chat_only
     @exempt_admins()
     def add_user(self, bot, update):
         update = update.to_dict()
@@ -56,13 +57,9 @@ class ThorBot():
         except pymongo.errors.DuplicateKeyError as dup:
             pass
 
-        # Testing prints
-        users = self.config.db.users.find()
-        for user in users:
-            logger.info(user)
-
         self.link_sniffer(bot, update, user_id, chat_id, username)
 
+    @config_chat_only
     @admin_only()
     def warn(self, bot, update, args):
         update = update.to_dict()
@@ -92,14 +89,23 @@ class ThorBot():
         updated_warning = user_record['warnings'] + 1
         bot.delete_message(chat_id=chat_id,
                            message_id=update['message']['message_id'])
-        message = (emojize(
-            FINAL_WARNING.format(num=updated_warning, username=username), use_aliases=True) if
-            user_record['warnings'] + 1 == self.config.warn_limit - 1 else
-            emojize(WARN.format(
-               num=updated_warning, username=username), use_aliases=True))
+
+        if updated_warning == self.config.warn_limit - 1:
+            message = emojize(FINAL_WARNING.format(
+                num=updated_warning, username=username), use_aliases=True)
+        elif updated_warning == self.config.warn_limit:
+            bot.kick_chat_member(chat_id, user_record['user_id'])
+            bot.send_message(chat_id=chat_id,
+                             text="Kicked user {}".format(username))
+            self.config.db.users.remove(user_record['_id'])
+            return
+        else:
+            message = emojize(WARN.format(
+               num=updated_warning, username=username), use_aliases=True)
         bot.send_message(chat_id=chat_id,
                          text=emojize(message))
 
+    @config_chat_only
     @admin_only()
     def clear_warnings(self, bot, update, args):
         update = update.to_dict()
@@ -132,6 +138,7 @@ class ThorBot():
         bot.send_message(chat_id=chat_id,
                          text=message)
 
+    @config_chat_only
     @admin_only()
     def permit_link(self, bot, update, args):
         update = update.to_dict()
@@ -195,6 +202,7 @@ class ThorBot():
             bot.send_message(chat_id=chat_id,
                              text=emojize(LINK_WARN.format(username=username)))
 
+    @config_chat_only
     def handle_new_chat_members(self, bot, update):
         msg = update.effective_message
         first_name = msg['new_chat_members'][0]['first_name']
@@ -237,6 +245,24 @@ class ThorBot():
                          use_aliases=True))
         self.config.last_welcome_id = welcome['message_id']
 
+        # Finally, inster the user
+        user_id = msg['new_chat_members'][0]['id']
+        try:
+            username = '@' + msg['new_chat_members'][0]['username']
+        except KeyError:
+            logger.info("No username for user")
+            return
+        chat_id = msg.chat.id
+        try:
+            self.config.db.users.insert_one({'username': username,
+                                             'user_id': user_id,
+                                             'chat_id': chat_id,
+                                             'warnings': 0,
+                                             'link_permits': 0})
+        except pymongo.errors.DuplicateKeyError as dup:
+            pass
+
+    @config_chat_only
     def handle_left_chat_member(self, bot, update):
         msg = update.effective_message
         try:

@@ -1,6 +1,17 @@
 from functools import wraps
 
 
+def config_chat_only(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        update = args[2].to_dict() if not isinstance(args[2], dict) else args[2]
+        chat_id = update['message']['chat']['id']
+        if int(chat_id) != int(args[0].config.group_id):
+            return
+        f(*args, **kwargs)
+    return wrapper
+
+
 def admin_only():
     def decorator(f):
         @wraps(f)
