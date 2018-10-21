@@ -4,7 +4,10 @@ from pymongo import MongoClient
 
 
 class Config():
-    data = {}
+    data = {
+        'last_welcome_id': None,
+        'admin_ids': None
+    }
 
     def __init__(self):
         try:
@@ -12,11 +15,12 @@ class Config():
                 'telegram_api_key': env.get('BOT_API_KEY'),
                 'group_id': env.get('GROUP_ID'),
                 'permitted_ids': [env.get('MASTER_ID')],
+                'warn_limit': 3,
                 'blacklist': []
             }
 
             # Setup DB
-            client = MongoClient('mongodb://mongo:27017')
+            client = MongoClient('localhost:27017')
             self.db = client.test
             self.db.users.create_index([('username', pymongo.ASCENDING)],
                                        unique=True)
@@ -40,9 +44,22 @@ class Config():
     def admin_ids(self):
         return self.data['admin_ids']
 
-    def set_admin_ids(self, admin_ids):
+    @admin_ids.setter
+    def admin_ids(self, admin_ids):
         self.data['admin_ids'] = admin_ids
 
     @property
     def blacklist(self):
         return self.data['blacklist']
+
+    @property
+    def warn_limit(self):
+        return self.settings['warn_limit']
+
+    @property
+    def last_welcome_id(self):
+        return self.data['last_welcome_id']
+
+    @last_welcome_id.setter
+    def last_welcome_id(self, msg_id):
+        self.data['last_welcome_id'] = msg_id
