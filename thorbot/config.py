@@ -20,7 +20,7 @@ class Config():
             }
 
             # Setup DB
-            client = MongoClient('localhost:27017')
+            client = MongoClient('mongodb://mongo:27017')
             self.db = client.test
             self.db.users.create_index([('username', pymongo.ASCENDING)],
                                        unique=True)
