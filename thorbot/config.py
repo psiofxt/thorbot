@@ -22,8 +22,10 @@ class Config():
             # Setup DB
             client = MongoClient('mongodb://mongo:27017')
             self.db = client.test
-            self.db.users.create_index([('username', pymongo.ASCENDING)],
-                                       unique=True)
+            if self.db.users.index_information().get('username_1_chat_id_1') is None:
+                self.db.users.create_index([('username', pymongo.ASCENDING),
+                                            ('chat_id', pymongo.ASCENDING)],
+                                           unique=True)
 
         except KeyError as e:
             raise Exception(e)
