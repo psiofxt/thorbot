@@ -24,3 +24,11 @@ FINAL_WARNING = (
 WELCOME_MESSAGE = (
     "Welcome, {first_name}. Please enjoy your stay :smile:"
 )
+
+AIRDROP = (
+    "An admin has not yet given me this information, check back soon."
+)
+
+TOKENS = (
+    "An admin has not yet given me this information, check back soon."
+)

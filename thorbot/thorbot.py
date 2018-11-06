@@ -14,7 +14,8 @@ from pymongo import MongoClient
 # local
 from config import Config
 from messages import (
-    LINK_WARN, PERMITTED, WARN, FINAL_WARNING, WELCOME_MESSAGE, CLEAR_WARN
+    LINK_WARN, PERMITTED, WARN, FINAL_WARNING, WELCOME_MESSAGE, CLEAR_WARN,
+    AIRDROP, TOKENS
 )
 from utils import admin_only, exempt_admins, config_chat_only
 
@@ -24,8 +25,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-html_pattern = re.compile('.*https?://*.', flags=re.IGNORECASE)
-
 
 class ThorBot():
     def __init__(self):
@@ -34,6 +33,8 @@ class ThorBot():
     def error(self, bot, update, error):
         logger.warning('Update "%s" caused error "%s"', update, error)
 
+    @config_chat_only
+    @admin_only()
     def clear_db(self, bot, update):
         self.config.db.users.remove({})
 
@@ -56,8 +57,6 @@ class ThorBot():
                                              'link_permits': 0})
         except pymongo.errors.DuplicateKeyError as dup:
             pass
-
-        self.link_sniffer(bot, update, user_id, chat_id, username)
 
     @config_chat_only
     @admin_only()
@@ -177,31 +176,6 @@ class ThorBot():
                          text=emojize(PERMITTED.format(
                             num=num, username=username), use_aliases=True))
 
-    def link_sniffer(self, bot, update, user_id, chat_id, username):
-        if (html_pattern.match(update['message']['text']) or
-            update['message'].get('forward_from') or
-            update['message'].get('forward_date')):
-
-            user_record = self.config.db.users.find_one(
-                {
-                    'username': username,
-                    'chat_id': chat_id
-                }
-            )
-            if user_record and user_record['link_permits'] > 0:
-                self.config.db.users.update_one(
-                    {'user_id': user_id},
-                    {
-                        '$inc': {
-                            'link_permits': -1
-                        }
-                    }, upsert=False)
-                return
-            bot.delete_message(chat_id=chat_id,
-                               message_id=update['message']['message_id'])
-            bot.send_message(chat_id=chat_id,
-                             text=emojize(LINK_WARN.format(username=username)))
-
     @config_chat_only
     def handle_new_chat_members(self, bot, update):
         msg = update.effective_message
@@ -280,6 +254,79 @@ class ThorBot():
             else:
                 raise
 
+    @config_chat_only
+    @exempt_admins()
+    def handle_forwarded(self, bot, update):
+        update = update.to_dict()
+        chat_id = update['message']['chat']['id']
+        username = '@' + update['message']['from']['username']
+        user_id = update['message']['from']['id']
+
+        user_record = self.config.db.users.find_one(
+            {
+                'username': username,
+                'chat_id': chat_id
+            }
+        )
+        if user_record and user_record['link_permits'] > 0:
+            self.config.db.users.update_one(
+                {'user_id': user_id},
+                {
+                    '$inc': {
+                        'link_permits': -1
+                    }
+                }, upsert=False)
+            return
+        bot.delete_message(chat_id=chat_id,
+                           message_id=update['message']['message_id'])
+
+    @config_chat_only
+    @exempt_admins()
+    def handle_links(self, bot, update):
+        update = update.to_dict()
+        chat_id = update['message']['chat']['id']
+        username = '@' + update['message']['from']['username']
+        user_id = update['message']['from']['id']
+
+        user_record = self.config.db.users.find_one(
+            {
+                'username': username,
+                'chat_id': chat_id
+            }
+        )
+        if user_record and user_record['link_permits'] > 0:
+            self.config.db.users.update_one(
+                {'user_id': user_id},
+                {
+                    '$inc': {
+                        'link_permits': -1
+                    }
+                }, upsert=False)
+            return
+        bot.delete_message(chat_id=chat_id,
+                           message_id=update['message']['message_id'])
+        bot.send_message(chat_id=chat_id,
+                         text=emojize(LINK_WARN.format(username=username)))
+
+    @config_chat_only
+    @exempt_admins()
+    def handle_files(self, bot, update):
+        update = update.to_dict()
+        bot.delete_message(chat_id=update['message']['chat']['id'],
+                           message_id=update['message']['message_id'])
+
+    @config_chat_only
+    def airdrop(self, bot, update):
+        update = update.to_dict()
+        bot.send_message(chat_id=update['message']['chat']['id'],
+                         text=AIRDROP)
+
+    @config_chat_only
+    def tokens(self, bot, update):
+        update = update.to_dict()
+        bot.send_message(chat_id=update['message']['chat']['id'],
+                         text=TOKENS)
+
     def run(self):
         updater = Updater(self.config.telegram_api_key)
         bot = updater.bot
@@ -295,6 +342,11 @@ class ThorBot():
         dp.add_error_handler(self.error)
 
         # Message handlers
+        dp.add_handler(MessageHandler(Filters.document, self.handle_files))
+        dp.add_handler(MessageHandler(Filters.entity("url"),
+            self.handle_links))
+        dp.add_handler(MessageHandler(Filters.forwarded,
+            self.handle_forwarded))
         dp.add_handler(MessageHandler(Filters.text, self.add_user))
         dp.add_handler(MessageHandler(
             Filters.status_update.new_chat_members,
@@ -304,6 +356,8 @@ class ThorBot():
             self.handle_left_chat_member))
 
         # Command handlers
+        dp.add_handler(CommandHandler("airdrop", self.airdrop))
+        dp.add_handler(CommandHandler("tokens", self.tokens))
         dp.add_handler(CommandHandler("clear_db", self.clear_db))
         dp.add_handler(CommandHandler("warn", self.warn, pass_args=True))
         dp.add_handler(CommandHandler("clear_warnings",
