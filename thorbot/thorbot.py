@@ -48,6 +48,9 @@ class ThorBot():
         except KeyError:
             logger.info("No username for user")
             return
+        except TypeError:
+            logger.info("No username for user")
+            return
         chat_id = update['message']['chat']['id']
         try:
             self.config.db.users.insert_one({'username': username,
@@ -161,6 +164,8 @@ class ThorBot():
 
         if not user_record:
             logger.error("No record found for user")
+            bot.delete_message(chat_id=chat_id,
+                               message_id=update['message']['message_id'])
             return
 
         self.config.db.users.update_one(
@@ -225,6 +230,9 @@ class ThorBot():
         try:
             username = '@' + msg['new_chat_members'][0]['username']
         except KeyError:
+            logger.info("No username for user")
+            return
+        except TypeError:
             logger.info("No username for user")
             return
         chat_id = msg.chat.id
