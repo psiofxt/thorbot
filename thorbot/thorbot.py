@@ -268,7 +268,13 @@ class ThorBot():
     def handle_forwarded(self, bot, update):
         update = update.to_dict()
         chat_id = update['message']['chat']['id']
-        username = '@' + update['message']['from']['username']
+        try:
+            username = '@' + update['message']['from']['username']
+        except TypeError:
+            logger.info("No username for user")
+            bot.delete_message(chat_id=chat_id,
+                               message_id=update['message']['message_id'])
+            return
         user_id = update['message']['from']['id']
 
         user_record = self.config.db.users.find_one(
@@ -294,7 +300,13 @@ class ThorBot():
     def handle_links(self, bot, update):
         update = update.to_dict()
         chat_id = update['message']['chat']['id']
-        username = '@' + update['message']['from']['username']
+        try:
+            username = '@' + update['message']['from']['username']
+        except TypeError:
+            logger.info("No username for user")
+            bot.delete_message(chat_id=chat_id,
+                               message_id=update['message']['message_id'])
+            return
         user_id = update['message']['from']['id']
 
         user_record = self.config.db.users.find_one(
@@ -321,6 +333,7 @@ class ThorBot():
     @exempt_admins()
     def handle_files(self, bot, update):
         update = update.to_dict()
+        print(update)
         bot.delete_message(chat_id=update['message']['chat']['id'],
                            message_id=update['message']['message_id'])
 
@@ -351,7 +364,8 @@ class ThorBot():
         dp.add_error_handler(self.error)
 
         # Message handlers
-        dp.add_handler(MessageHandler(Filters.document, self.handle_files))
+        dp.add_handler(MessageHandler(Filters.document & (~ Filters.animation),
+                                      self.handle_files))
         dp.add_handler(MessageHandler(Filters.entity("url"),
             self.handle_links))
         dp.add_handler(MessageHandler(Filters.forwarded,
