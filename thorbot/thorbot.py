@@ -333,7 +333,6 @@ class ThorBot():
     @exempt_admins()
     def handle_files(self, bot, update):
         update = update.to_dict()
-        print(update)
         bot.delete_message(chat_id=update['message']['chat']['id'],
                            message_id=update['message']['message_id'])
 
