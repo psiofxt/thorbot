@@ -63,7 +63,7 @@ class ThorBot():
 
     @config_chat_only
     @admin_only()
-    def warn(self, bot, update, args):
+    def add_warn(self, bot, update, args):
         update = update.to_dict()
         if not args:
             return
@@ -358,6 +358,14 @@ class ThorBot():
         bot.send_message(chat_id=update['message']['chat']['id'],
                          text=TOKENS)
 
+    @config_chat_only
+    @admin_only()
+    def warn(self, bot, update):
+        update = update.to_dict()
+        bot.send_message(chat_id=update['message']['chat']['id'],
+                         text=emojize(WARN, use_aliases=True),
+                         parse_mode='Markdown')
+
     def run(self):
         updater = Updater(self.config.telegram_api_key)
         bot = updater.bot
@@ -391,7 +399,7 @@ class ThorBot():
         dp.add_handler(CommandHandler("airdrop", self.airdrop))
         dp.add_handler(CommandHandler("tokens", self.tokens))
         dp.add_handler(CommandHandler("clear_db", self.clear_db))
-        dp.add_handler(CommandHandler("warn", self.warn, pass_args=True))
+        dp.add_handler(CommandHandler("warn", self.warn))
         dp.add_handler(CommandHandler("clear_warnings",
                                       self.clear_warnings, pass_args=True))
         dp.add_handler(CommandHandler("permit", self.permit_link,

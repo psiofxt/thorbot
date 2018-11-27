@@ -8,8 +8,12 @@ PERMITTED = (
 )
 
 WARN = (
-    ":police_officer: {username}, you have been warned. You currently have "
-    "{num} warnings. Be careful!"
+    ":warning: ATTENTION :warning:\n\n"
+    "There are scammers actively private messaging people pretending to be an "
+    "Admin or Butler Bot. There are NO special deals, and we will never PM "
+    "you an address to send funds to.  Our emails end with `@emanate.live` "
+    "There is a list of our admins, please double check the pinned message.\n\n"
+    ":warning: ATTENTION :warning:"
 )
 
 CLEAR_WARN = (
@@ -29,9 +33,9 @@ WELCOME_MESSAGE = (
 )
 
 AIRDROP = (
-    "An admin has not yet given me this information, check back soon."
+    "https://medium.com/emanate-live/the-emanate-airdrop-is-here-b8d13e7aaced"
 )
 
 TOKENS = (
-    "An admin has not yet given me this information, check back soon."
+    "https://medium.com/emanate-live/the-emanate-airdrop-is-here-b8d13e7aaced"
 )
