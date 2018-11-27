@@ -37,5 +37,5 @@ AIRDROP = (
 )
 
 TOKENS = (
-    "https://medium.com/emanate-live/the-emanate-airdrop-is-here-b8d13e7aaced"
+    "https://medium.com/emanate-live/emanate-bagdrop-bounty-84a37c520d7b"
 )
