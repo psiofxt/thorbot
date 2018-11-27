@@ -8,12 +8,12 @@ PERMITTED = (
 )
 
 WARN = (
-    ":warning: ATTENTION :warning:\n\n"
-    "There are scammers actively private messaging people pretending to be an "
-    "Admin or Butler Bot. There are NO special deals, and we will never PM "
-    "you an address to send funds to.  Our emails end with `@emanate.live` "
-    "There is a list of our admins, please double check the pinned message.\n\n"
-    ":warning: ATTENTION :warning:"
+    "*:warning: ATTENTION :warning:*\n\n"
+    "*There are scammers actively private messaging people pretending to be an *"
+    "*Admin or Butler Bot. There are NO special deals, and we will never PM *"
+    "*you an address to send funds to. Our emails end with @emanate.live *"
+    "*There is a list of our admins, please double check the pinned message.*\n\n"
+    "*:warning: ATTENTION :warning:*"
 )
 
 CLEAR_WARN = (

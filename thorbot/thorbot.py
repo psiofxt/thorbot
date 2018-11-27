@@ -362,6 +362,8 @@ class ThorBot():
     @admin_only()
     def warn(self, bot, update):
         update = update.to_dict()
+        bot.delete_message(chat_id=update['message']['chat']['id'],
+                           message_id=update['message']['message_id'])
         bot.send_message(chat_id=update['message']['chat']['id'],
                          text=emojize(WARN, use_aliases=True),
                          parse_mode='Markdown')
