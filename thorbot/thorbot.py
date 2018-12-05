@@ -222,7 +222,8 @@ class ThorBot():
             chat_id=msg.chat.id,
             text=emojize(WELCOME_MESSAGE.format(first_name=first_name),
                          use_aliases=True),
-            parse_mode='Markdown')
+            parse_mode='Markdown',
+            disable_web_page_preview=True)
         self.config.last_welcome_id = welcome['message_id']
 
         # Finally, inster the user

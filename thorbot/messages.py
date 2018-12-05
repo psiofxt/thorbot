@@ -26,9 +26,8 @@ WELCOME_MESSAGE = (
     "Feel free to join in on any conversations and stay tuned in channel for "
     "community AMA's. Also feel free to head over to the dbcrypto YouTube "
     "channel to check any recorded AMAs. *Thanks again for joining us!*\n"
-    "dbcrypto.io\n"
-    "https://bit.ly/2LTOyHa"
-
+    "[Website](dbcrypto.io)\n"
+    "[YouTube](https://bit.ly/2LTOyHa)"
 )
 
 AIRDROP = (
