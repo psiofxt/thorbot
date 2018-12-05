@@ -378,8 +378,8 @@ class ThorBot():
             self.handle_left_chat_member))
 
         # Command handlers
-        dp.add_handler(CommandHandler("airdrop", self.airdrop))
-        dp.add_handler(CommandHandler("tokens", self.tokens))
+        # dp.add_handler(CommandHandler("airdrop", self.airdrop))
+        # dp.add_handler(CommandHandler("tokens", self.tokens))
         dp.add_handler(CommandHandler("clear_db", self.clear_db))
         dp.add_handler(CommandHandler("warn", self.warn, pass_args=True))
         dp.add_handler(CommandHandler("clear_warnings",

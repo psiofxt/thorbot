@@ -22,7 +22,11 @@ FINAL_WARNING = (
 )
 
 WELCOME_MESSAGE = (
-    "Welcome, {first_name}. Please enjoy your stay :smile:"
+    ":globe_with_meridians: Welcome {first_name} to "
+    "Latitude Blockchain Services' Telegram! :globe_with_meridians:\n"
+    "Please take a look at the pinned post and check out our website "
+    "http://latitude.services/. If you have any questions, don't hesitate to "
+    "ask one of our friendly admins!  *Thanks again for joining us!*"
 )
 
 AIRDROP = (
