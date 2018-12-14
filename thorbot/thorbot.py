@@ -15,7 +15,7 @@ from pymongo import MongoClient
 from config import Config
 from messages import (
     LINK_WARN, PERMITTED, WARN, FINAL_WARNING, WELCOME_MESSAGE, CLEAR_WARN,
-    AIRDROP, TOKENS
+    AIRDROP, TOKENS, ICO, ABOUT
 )
 from utils import admin_only, exempt_admins, config_chat_only
 
@@ -63,7 +63,10 @@ class ThorBot():
 
     @config_chat_only
     @admin_only()
-    def warn(self, bot, update, args):
+    def add_warn(self, bot, update, args):
+        """
+            Function currently unused by client
+        """
         update = update.to_dict()
         if not args:
             return
@@ -358,6 +361,34 @@ class ThorBot():
         bot.send_message(chat_id=update['message']['chat']['id'],
                          text=TOKENS)
 
+    @config_chat_only
+    @admin_only()
+    def warn(self, bot, update):
+        update = update.to_dict()
+        bot.delete_message(chat_id=update['message']['chat']['id'],
+                           message_id=update['message']['message_id'])
+        bot.send_message(chat_id=update['message']['chat']['id'],
+                         text=emojize(WARN, use_aliases=True),
+                         parse_mode='Markdown')
+
+    @config_chat_only
+    def ico(self, bot, update):
+        update = update.to_dict()
+        bot.delete_message(chat_id=update['message']['chat']['id'],
+                           message_id=update['message']['message_id'])
+        bot.send_message(chat_id=update['message']['chat']['id'],
+                         text=emojize(ICO, use_aliases=True),
+                         parse_mode='Markdown')
+
+    @config_chat_only
+    def about(self, bot, update):
+        update = update.to_dict()
+        bot.delete_message(chat_id=update['message']['chat']['id'],
+                           message_id=update['message']['message_id'])
+        bot.send_message(chat_id=update['message']['chat']['id'],
+                         text=emojize(ABOUT, use_aliases=True),
+                         parse_mode='Markdown')
+
     def run(self):
         updater = Updater(self.config.telegram_api_key)
         bot = updater.bot
@@ -391,7 +422,9 @@ class ThorBot():
         dp.add_handler(CommandHandler("airdrop", self.airdrop))
         dp.add_handler(CommandHandler("tokens", self.tokens))
         dp.add_handler(CommandHandler("clear_db", self.clear_db))
-        dp.add_handler(CommandHandler("warn", self.warn, pass_args=True))
+        dp.add_handler(CommandHandler("warn", self.warn))
+        dp.add_handler(CommandHandler("ico", self.ico))
+        dp.add_handler(CommandHandler("about", self.about))
         dp.add_handler(CommandHandler("clear_warnings",
                                       self.clear_warnings, pass_args=True))
         dp.add_handler(CommandHandler("permit", self.permit_link,
