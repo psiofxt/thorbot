@@ -275,6 +275,11 @@ class ThorBot():
             bot.delete_message(chat_id=chat_id,
                                message_id=update['message']['message_id'])
             return
+        except KeyError:
+            logger.info("No username for user")
+            bot.delete_message(chat_id=chat_id,
+                               message_id=update['message']['message_id'])
+            return
         user_id = update['message']['from']['id']
 
         user_record = self.config.db.users.find_one(
@@ -303,6 +308,11 @@ class ThorBot():
         try:
             username = '@' + update['message']['from']['username']
         except TypeError:
+            logger.info("No username for user")
+            bot.delete_message(chat_id=chat_id,
+                               message_id=update['message']['message_id'])
+            return
+        except KeyError:
             logger.info("No username for user")
             bot.delete_message(chat_id=chat_id,
                                message_id=update['message']['message_id'])
