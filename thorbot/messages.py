@@ -27,9 +27,11 @@ FINAL_WARNING = (
 
 WELCOME_MESSAGE = (
     ":robot_face:\n:headphones: *Welcome {first_name} to Emanate's Telegram!* :headphones:"
+    "\nJoin our *Discord* channel for the most up to date information: https://discord.gg/yBvsCnb "
     "\nPlease take a look at the *pinned post* and check out our website https://emanate.live/. "
     "If you have any questions, don't hesitate to ask one of our friendly admins! "
-    "We will be posting new developments as they happen, so stay tuned. *Thanks again for joining us!*"
+    "We will be posting new developments as they happen in our *Discord*, so stay tuned."
+    "\n*Thanks again for joining us!*"
 )
 
 AIRDROP = (
